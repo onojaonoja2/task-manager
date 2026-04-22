@@ -13,6 +13,7 @@
 /.vscode
 /.zed
 /auth.json
+/AGENTS.md
 /node_modules
 /public/build
 /public/hot
