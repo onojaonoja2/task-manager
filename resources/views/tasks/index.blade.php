@@ -50,11 +50,12 @@
                         >
                             Edit
                         </a>
-                        <form action="{{ route('tasks.destroy', $task) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this task?')">
+                        <form action="{{ route('tasks.destroy', $task) }}" method="POST" class="delete-form">
                             @csrf
                             @method('DELETE')
                             <button 
-                                type="submit" 
+                                type="button" 
+                                onclick="showDeleteModal('{{ route('tasks.destroy', $task) }}')"
                                 class="px-3 py-1 text-sm text-red-700 bg-red-100 hover:bg-red-200 rounded-md"
                             >
                                 Delete
@@ -79,6 +80,7 @@
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     const taskList = document.getElementById('task-list');
     
@@ -106,6 +108,40 @@
                         location.reload();
                     }
                 });
+            }
+        });
+    }
+
+    function showDeleteModal(url) {
+        Swal.fire({
+            title: 'Delete Task',
+            text: 'Are you sure you want to delete this task?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = url;
+                
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
+                form.appendChild(csrfToken);
+                
+                const methodField = document.createElement('input');
+                methodField.type = 'hidden';
+                methodField.name = '_method';
+                methodField.value = 'DELETE';
+                form.appendChild(methodField);
+                
+                document.body.appendChild(form);
+                form.submit();
             }
         });
     }
